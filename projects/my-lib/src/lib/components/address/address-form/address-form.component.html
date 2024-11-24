@@ -1,0 +1,35 @@
+<div class="form" [formGroup]="addressForm()">
+  <div class="input input--full">
+    <label for="addressLineOne">Address Line One</label>
+    <input type="text" id="addressLineOne" [formControl]="addressLineOne" />
+  </div>
+
+  <div class="input input--full">
+    <label for="addressLineTwo">Address Line Two</label>
+    <input type="text" id="addressLineTwo" [formControl]="addressLineTwo" />
+  </div>
+
+  <div class="form-row">
+    <div class="input input--full">
+      <label for="city">City</label>
+      <input type="text" id="city" [formControl]="city" />
+    </div>
+
+    <div class="input-group--half">
+      <div class="input">
+        <label for="state">State</label>
+        <select id="state" [formControl]="state">
+          <option value="" disabled>Select State</option>
+          @for (state of states; track $index) {
+          <option [value]="state.value">{{ state.display }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="input">
+        <label for="zip">ZIP Code</label>
+        <input type="text" id="zip" [formControl]="zip" />
+      </div>
+    </div>
+  </div>
+</div>

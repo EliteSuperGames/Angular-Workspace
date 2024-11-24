@@ -1,0 +1,64 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+
+    // City should take up more space
+    .input--full {
+      flex: 2; // Now takes up 2 parts of the space
+    }
+
+    // State/ZIP container should take up less
+    .input-group--half {
+      flex: 1; // Takes up 1 part of the space
+    }
+  }
+}
+
+// Always side by side, regardless of screen size
+.input-group--half {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+
+  .input,
+  select {
+    flex: 1;
+  }
+}
+
+.input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+
+  label {
+    font-weight: 500;
+  }
+
+  input,
+  select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+
+    &:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+  }
+}
