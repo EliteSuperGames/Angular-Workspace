@@ -19,10 +19,14 @@ import { CommonModule } from '@angular/common';
 })
 export class AppComponent {
   fb = new FormBuilder();
-  addressObj: Partial<AddressModel> = {};
+
+  addressObj: Partial<AddressModel> = {
+    city: 'Franklin',
+    zip: '45005',
+  };
 
   parentForm = new FormGroup({
-    addressForm: AddressFormComponent.createForm(this.fb),
+    addressForm: AddressFormComponent.createForm(this.fb, this.addressObj),
   });
 
   get addressForm(): FormGroup<AddressFormModel> {

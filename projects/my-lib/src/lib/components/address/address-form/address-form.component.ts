@@ -8,7 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 
-import { AddressFormModel, states } from '../address.constants';
+import { AddressFormModel, AddressModel, states } from '../address.constants';
 
 @Component({
   selector: 'lib-address-form',
@@ -45,16 +45,22 @@ export class AddressFormComponent {
     return this.addressForm().controls.zip;
   }
 
-  static createForm(fb: FormBuilder): FormGroup<AddressFormModel> {
-    return fb.group<AddressFormModel>({
+  static createForm(
+    fb: FormBuilder,
+    initialValues?: Partial<AddressModel>
+  ): FormGroup<AddressFormModel> {
+    const form = fb.group<AddressFormModel>({
       addressLineOne: new FormControl('', {
         nonNullable: true,
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.maxLength(25)],
       }),
-      addressLineTwo: new FormControl('', { nonNullable: true }),
+      addressLineTwo: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.maxLength(25)],
+      }),
       city: new FormControl('', {
         nonNullable: true,
-        validators: [Validators.required],
+        validators: [Validators.required, Validators.maxLength(25)],
       }),
       state: new FormControl('', {
         nonNullable: true,
@@ -62,8 +68,18 @@ export class AddressFormComponent {
       }),
       zip: new FormControl('', {
         nonNullable: true,
-        validators: [Validators.required],
+        validators: [
+          Validators.required,
+          Validators.maxLength(5),
+          Validators.minLength(5),
+        ],
       }),
     });
+
+    if (initialValues) {
+      form.patchValue(initialValues);
+    }
+
+    return form;
   }
 }
