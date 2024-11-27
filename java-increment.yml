@@ -1,0 +1,65 @@
+name: Version Control
+
+on:
+  push:
+    branches:
+      - Development
+      - Staging
+      - Production
+    paths-ignore:
+      # don't run action if only pom.xml is changed
+      # prevents infinite loop
+      - "**/pom.xml"
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Java
+        #clones branch
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+
+      - name: Set Version Type
+        id: version-type
+        run: |
+          if [[ ${GITHUB_REF#refs/heads/} == "Development" ]]; then
+            echo "type=patch" >> $GITHUB_OUTPUT
+          elif [[ ${GITHUB_REF#refs/heads/} == "Staging" ]]; then
+            echo "type=minor" >> $GITHUB_OUTPUT
+          elif [[ ${GITHUB_REF#refs/heads/} == "Production" ]]; then
+            echo "type=major" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Bump Version
+        run: |
+          VERSION_TYPE=${{ steps.version-type.outputs.type }}
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+
+        # Calculate new version based on branch
+          NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. -v type="$VERSION_TYPE" '
+            type=="patch" {$NF = $NF + 1}
+            type=="minor" {$(NF-1) = $(NF-1) + 1; $NF = 0}
+            type=="major" {$1 = $1 + 1; $(NF-1) = 0; $NF = 0}
+            {print}' | sed 's/ /./g')
+        # udpates all POM versions
+          mvn versions:set -DnewVersion=$NEW_VERSION  
+          mvn versions:commit
+
+      - name: Commit and Push
+        run: |
+          git add "**/pom.xml"
+          git commit -m "ci: bump version to $NEW_VERSION [skip ci]"
+          git push

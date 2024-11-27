@@ -5,6 +5,8 @@ on:
   push:
     branches: [main]
     paths-ignore:
+      # dont run action if these are the only file changes
+      # prevents infinite loop
       - "package.json"
       - "package-lock.json"
 
@@ -12,14 +14,18 @@ permissions:
   contents: write
 
 jobs:
+  #name of job
   bump-version:
     runs-on: ubuntu-latest
 
     steps:
+      #clones repo
       - uses: actions/checkout@v4
         with:
+          #auth token for pushing changes
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      #installs node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
