@@ -19,7 +19,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AppComponent {
   fb = new FormBuilder();
-
+  title = 'my-application';
   addressObj: Partial<AddressModel> = {
     city: 'Franklin',
     zip: '45005',

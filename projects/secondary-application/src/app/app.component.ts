@@ -25,7 +25,7 @@ import { SubmitButtonGroupComponent } from '../../../my-lib/src/lib/components/b
 })
 export class AppComponent {
   fb = new FormBuilder();
-
+  title = 'secondary-application';
   addressObj: Partial<AddressModel> = {
     addressLineOne: '2745 Towne Blvd',
   };
