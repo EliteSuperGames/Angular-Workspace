@@ -1,0 +1,10 @@
+.app-padding {
+  padding: 1rem;
+}
+
+:host {
+  --primary-color: #2196f3;
+  --primary-color-alpha: rbga(33, 150, 243, 0.25);
+  --secondary-color: #757575;
+  --secondary-color-alpha: rgba(117, 117, 117, 0.25);
+}

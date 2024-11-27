@@ -1,0 +1,17 @@
+<div class="app-wrapper app-padding" [formGroup]="parentForm">
+  <lib-address-form [addressForm]="addressForm"></lib-address-form>
+
+  <lib-demographics-form
+    [demographicForm]="demographicForm"
+  ></lib-demographics-form>
+
+  <lib-submit-button-group
+    [isSubmitDisabled]="parentForm.invalid"
+  ></lib-submit-button-group>
+
+  addressForm: {{ addressForm.valid }}
+  <br />
+  demographicForm: {{ demographicForm.valid }}
+  <br />
+  parentForm: {{ parentForm.valid }}
+</div>

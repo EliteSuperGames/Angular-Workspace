@@ -1,0 +1,21 @@
+<div class="button-group">
+  <button
+    *ngIf="showBackButton()"
+    type="button"
+    class="button button--secondary"
+    [disabled]="isLoading()"
+    (click)="onBackClicked()"
+  >
+    {{ backText() }}
+  </button>
+
+  <button
+    type="submit"
+    class="button button--primary"
+    [disabled]="isSubmitDisabled() || isLoading()"
+    (click)="onSubmitClicked()"
+  >
+    <span *ngIf="isLoading()" class="spinner"></span>
+    {{ isLoading() ? loadingText() : submitText() }}
+  </button>
+</div>
