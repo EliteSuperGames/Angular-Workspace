@@ -2,30 +2,26 @@ name: Version Control
 
 on:
   push:
-    branches:
-      - Development
-      - Staging
-      - Production
+    branches: [Development, Staging, Production]
     paths-ignore:
-      # don't run action if only pom.xml is changed
-      # prevents infinite loop
       - "**/pom.xml"
+      - ".github/workflows/**" # Prevent workflow file changes from triggering
 
 jobs:
   bump-version:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0 # Fetch all history for proper versioning
 
       - name: Setup Java
-        #clones branch
         uses: actions/setup-java@v3
         with:
           java-version: "17"
           distribution: "temurin"
+          cache: "maven" # Cache Maven packages
 
       - name: Configure Git
         run: |
@@ -35,28 +31,47 @@ jobs:
       - name: Set Version Type
         id: version-type
         run: |
-          if [[ ${GITHUB_REF#refs/heads/} == "Development" ]]; then
+          branch=${GITHUB_REF#refs/heads/}
+          if [[ $branch == "Development" ]]; then
             echo "type=patch" >> $GITHUB_OUTPUT
-          elif [[ ${GITHUB_REF#refs/heads/} == "Staging" ]]; then
+            echo "env=dev" >> $GITHUB_OUTPUT
+          elif [[ $branch == "Staging" ]]; then
             echo "type=minor" >> $GITHUB_OUTPUT
-          elif [[ ${GITHUB_REF#refs/heads/} == "Production" ]]; then
+            echo "env=stage" >> $GITHUB_OUTPUT
+          elif [[ $branch == "Production" ]]; then
             echo "type=major" >> $GITHUB_OUTPUT
+            echo "env=prod" >> $GITHUB_OUTPUT
           fi
 
       - name: Bump Version
         run: |
-          VERSION_TYPE=${{ steps.version-type.outputs.type }}
-          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          # Get current version without SNAPSHOT suffix
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/-SNAPSHOT//')
 
-        # Calculate new version based on branch
+          VERSION_TYPE=${{ steps.version-type.outputs.type }}
+          ENV=${{ steps.version-type.outputs.env }}
+
+          # Calculate new version
           NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. -v type="$VERSION_TYPE" '
             type=="patch" {$NF = $NF + 1}
             type=="minor" {$(NF-1) = $(NF-1) + 1; $NF = 0}
             type=="major" {$1 = $1 + 1; $(NF-1) = 0; $NF = 0}
             {print}' | sed 's/ /./g')
-        # udpates all POM versions
-          mvn versions:set -DnewVersion=$NEW_VERSION  
+
+          # Add SNAPSHOT suffix for non-production
+          if [[ $ENV != "prod" ]]; then
+            NEW_VERSION="${NEW_VERSION}-SNAPSHOT"
+          fi
+
+          # Update all module versions
+          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false
           mvn versions:commit
+
+          # Save version for commit message
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Verify Modules
+        run: mvn clean verify -DskipTests # Verify build works with new versions
 
       - name: Commit and Push
         run: |
