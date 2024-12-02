@@ -1,15 +1,3 @@
-<div class="app-wrapper app-padding">
-  <form [formGroup]="parentForm">
-    <lib-address-form [addressForm]="addressForm"></lib-address-form>
-  </form>
-  <lib-submit-button-group
-    [backText]="'Cancel'"
-    [isSubmitDisabled]="parentForm.invalid"
-    (backClicked)="backButtonClicked()"
-    (submitClicked)="submitButtonClicked()"
-  ></lib-submit-button-group>
+<button (click)="goToDemographics()">Go to demographics</button>
 
-  {{ addressObj | json }}
-</div>
-
-<hr />
+<router-outlet />

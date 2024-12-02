@@ -1,0 +1,20 @@
+<div class="app-wrapper app-padding">
+  <form [formGroup]="parentForm">
+    <label for="name">Name</label>
+    <input [formControl]="name" type="text" id="name" />
+    <lib-address-form [addressForm]="addressForm"></lib-address-form>
+  </form>
+  <lib-submit-button-group
+    [backText]="'Cancel'"
+    [isSubmitDisabled]="parentForm.invalid"
+    (backClicked)="backButtonClicked()"
+    (submitClicked)="submitButtonClicked()"
+  ></lib-submit-button-group>
+
+  @if (greeting()) {
+  {{ greeting()?.content }} <br />
+  {{ greeting()?.id }}
+  }
+</div>
+
+<hr />

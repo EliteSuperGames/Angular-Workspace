@@ -1,45 +1,51 @@
-# .github/workflows/version-bump.yml
 name: Version Bump
 
+# Triggers workflow on push to main branch
 on:
   push:
     branches: [main]
     paths-ignore:
-      # dont run action if these are the only file changes
-      # prevents infinite loop
+      # Prevents infinite loop by ignoring version file changes
       - "package.json"
       - "package-lock.json"
 
+# Grants write permission for pushing changes
 permissions:
   contents: write
 
 jobs:
-  #name of job
   bump-version:
     runs-on: ubuntu-latest
-
     steps:
-      #clones repo
+      # Checkout repository
       - uses: actions/checkout@v4
         with:
-          #auth token for pushing changes
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      #installs node.js
+      # Setup Node.js environment
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
+      # Configure Git identity for commits
       - name: Configure Git
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
 
-      - name: Bump Version
+      # Version bump logic based on commit messages
+      - name: Determine Version Bump
         run: |
-          npm version patch -no-git-tag-version
+          if git log -1 --pretty=%B | grep -i "BREAKING CHANGE"; then
+            npm version major -no-git-tag-version
+          elif git log -1 --pretty=%B | grep -i "feat"; then
+            npm version minor -no-git-tag-version
+          else
+            npm version patch -no-git-tag-version
+          fi
 
+      # Commit and push version changes
       - name: Commit and Push
         run: |
           git add package.json

@@ -6,7 +6,7 @@ import { Component, input, output } from '@angular/core';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './submit-button-group.component.html',
-  styleUrl: './submit-button-group.component.css',
+  styleUrl: './submit-button-group.component.scss',
 })
 export class SubmitButtonGroupComponent {
   isSubmitDisabled = input(false);

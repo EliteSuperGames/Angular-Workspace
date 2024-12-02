@@ -14,7 +14,6 @@ import { SubmitButtonGroupComponent } from '../../../my-lib/src/lib/components/b
   selector: 'app-root',
   standalone: true,
   imports: [
-    RouterOutlet,
     AddressFormComponent,
     DemographicsFormComponent,
     SubmitButtonGroupComponent,
